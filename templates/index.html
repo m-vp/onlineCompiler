@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PY Compiler</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css">
+</head>
+<body style="font-family: Verdana;"><br>
+    <h1 style="text-align: center;">PY Compiler</h1>
+    <form id="code-form">
+        {% csrf_token %}
+        <div class="form-group" style="margin-left: 50px; margin-right: 50px;">
+            <label for="code-area">Code Area</label>
+            <textarea type="text" class="form-control" id="codearea" name="codearea" rows="10">{{code_part}}</textarea>
+        </div>
+        <div class="form-group" style="margin-left: 50px; margin-right: 50px;">
+            <label for="inputarea">Input</label>
+            <textarea type="text" class="form-control" id="codearea" name="inputarea" rows="4">{{y}}</textarea>
+        </div>
+       
+
+        <div class="form-group" style="margin-left: 50px; margin-right: 50px;">
+            <label for="output">Output</label>
+            <textarea type="text" class="form-control" id="output" name="output" rows="4" disabled>{{output}}</textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="margin-left: 50px;">Submit</button>
+    </form>
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#codearea').keydown(function(event) {
+                // If tab key is pressed
+                if (event.keyCode === 9) {
+                    event.preventDefault();
+                    var textarea = $(this)[0];
+                    var start = textarea.selectionStart;
+                    var end = textarea.selectionEnd;
+                    var spaces = '    '; // Four spaces for one tab
+                    textarea.value = textarea.value.substring(0, start) + spaces + textarea.value.substring(end);
+                    textarea.selectionStart = textarea.selectionEnd = start + spaces.length;
+                }
+            });
+
+            $('#code-form').submit(function(event) {
+                event.preventDefault();
+                var formData = $(this).serialize();
+                $.ajax({
+                    type: 'POST',
+                    url: '/run',
+                    data: formData,
+                    success: function(response) {
+                        $('#output').val(response.output);
+                    },
+                    error: function(xhr, status, error) {
+                        $('#output').val(xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
